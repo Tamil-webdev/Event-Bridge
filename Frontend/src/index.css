@@ -1,0 +1,219 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap");
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --color-primary: #2563eb;
+  --color-secondary: #7c3aed;
+  --color-accent: #06b6d4;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-card: #ffffff;
+  --color-text-1: #0f172a;
+  --color-text-2: #475569;
+  --color-border: #e2e8f0;
+  --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.08);
+  --shadow-card: 0 14px 32px rgba(15, 23, 42, 0.08);
+  --radius-card: 16px;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-primary: #3b82f6;
+  --color-secondary: #8b5cf6;
+  --color-accent: #22d3ee;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-danger: #f87171;
+  --color-bg: #0f172a;
+  --color-surface: #1e293b;
+  --color-card: #111827;
+  --color-text-1: #f8fafc;
+  --color-text-2: #cbd5e1;
+  --color-border: #334155;
+  --shadow-soft: 0 24px 60px rgba(0, 0, 0, 0.35);
+  --shadow-card: 0 18px 42px rgba(0, 0, 0, 0.32);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--color-bg);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--color-primary) 13%, transparent), transparent 34rem),
+    radial-gradient(circle at bottom right, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent 32rem),
+    var(--color-bg);
+  color: var(--color-text-1);
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 16px;
+  text-rendering: optimizeLegibility;
+  transition: background-color 300ms ease-in-out, color 300ms ease-in-out;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+img {
+  display: block;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-primary) 22%, transparent);
+}
+
+:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-primary) 42%, transparent);
+  outline-offset: 3px;
+}
+
+.theme-transition,
+.theme-transition * {
+  transition:
+    background-color 300ms ease-in-out,
+    border-color 300ms ease-in-out,
+    color 300ms ease-in-out,
+    box-shadow 300ms ease-in-out;
+}
+
+.font-display {
+  font-family: "Poppins", "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+.app-shell {
+  min-height: 100vh;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--color-surface) 82%, transparent), transparent),
+    var(--color-bg);
+}
+
+.page-shell {
+  animation: page-fade 260ms ease-in-out both;
+}
+
+.glass-card {
+  background: color-mix(in srgb, var(--color-card) 92%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-border) 82%, transparent);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(18px);
+}
+
+.interactive-card {
+  transition: transform 220ms ease-in-out, box-shadow 220ms ease-in-out, border-color 220ms ease-in-out;
+}
+
+.interactive-card:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: var(--shadow-soft);
+  border-color: color-mix(in srgb, var(--color-primary) 36%, var(--color-border));
+}
+
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-ripple::after {
+  content: "";
+  position: absolute;
+  inset: 50%;
+  width: 1px;
+  height: 1px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.35);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.btn-ripple:active::after {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(180);
+  transition: transform 350ms ease-in-out, opacity 450ms ease-in-out;
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--color-border) 55%, transparent);
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-surface) 55%, transparent), transparent);
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.field-input:not(:placeholder-shown) + .field-label,
+.field-input:focus + .field-label,
+.field-input.has-value + .field-label {
+  top: -0.58rem;
+  left: 0.8rem;
+  padding: 0 0.35rem;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-size: 0.75rem;
+}
+
+.progress-fill {
+  transform-origin: left;
+  animation: progress-fill 700ms ease-in-out both;
+}
+
+@keyframes page-fade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes progress-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+
+  .interactive-card:hover {
+    transform: none;
+  }
+}
