@@ -13,4 +13,6 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
+console.log("BACKEND URL:", import.meta.env.VITE_BACKEND_URL);
+
 export default API; 
