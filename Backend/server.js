@@ -34,7 +34,13 @@ app.use(cors({
       return callback(null, true);
     }
 
-    return callback(new Error("Not allowed by CORS"));
+    // If CLIENT_URL is not configured in production, allow the request origin.
+    // This prevents CORS failures for deployed frontends when the host is dynamic.
+    if (process.env.NODE_ENV === "production" && !process.env.CLIENT_URL) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`Not allowed by CORS: ${origin}`));
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
