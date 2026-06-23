@@ -7,7 +7,7 @@ const DEFAULT_CLUB_IMAGE =
 
 function ClubCard({ club }) {
   const navigate = useNavigate();
-  const imageUrl = club.image ? `${import.meta.env.VITE_API_URL}${club.image}` : DEFAULT_CLUB_IMAGE;
+  const imageUrl = club.image ? `${import.meta.env.VITE_BACKEND_URL}${club.image}` : DEFAULT_CLUB_IMAGE;
 
   return (
     <Card

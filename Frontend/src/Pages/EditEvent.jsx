@@ -33,7 +33,7 @@ function EditEvent() {
           eventTime: event.eventTime || "",
           venue: event.venue || "",
         });
-        setImagePreview(event.image ? (event.image.startsWith("http") ? event.image : `${import.meta.env.VITE_API_URL}${event.image}`) : "");
+        setImagePreview(event.image ? (event.image.startsWith("http") ? event.image : `${import.meta.env.VITE_BACKEND_URL}${event.image}`) : "");
       } catch (err) {
         console.error("Failed to fetch event", err);
         setError("Failed to load event details");

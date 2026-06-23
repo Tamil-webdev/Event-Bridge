@@ -18,7 +18,7 @@ const EventCard = ({ event }) => {
   const imageUrl = event?.image
     ? event.image.startsWith("http")
       ? event.image
-      : `${import.meta.env.VITE_API_URL}${event.image}`
+      : `${import.meta.env.VITE_BACKEND_URL}${event.image}`
     : DEFAULT_IMAGE;
 
   const formatAddress = (address) => {
