@@ -74,7 +74,7 @@ function Layout() {
           <div className="flex h-20 items-center justify-between px-5">
             <button
               type="button"
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/home")}
               className="flex items-center gap-3 rounded-xl text-left"
               aria-label="Go to dashboard"
             >
@@ -91,7 +91,7 @@ function Layout() {
           </div>
 
           <nav className="flex-1 space-y-2 px-4 py-2">
-            <SideItem collapsed={collapsed} to="/" icon={LayoutDashboard} label="Dashboard" />
+            <SideItem collapsed={collapsed} to="/home" icon={LayoutDashboard} label="Dashboard" />
             <SideItem collapsed={collapsed} to="/clubs" icon={Users} label="Clubs" />
             <SideItem collapsed={collapsed} to="/create-club" icon={Plus} label="Create Club" />
             <SideItem collapsed={collapsed} to="/profile" icon={User} label="Profile" />
@@ -191,7 +191,7 @@ function Layout() {
             </div>
 
             <div className="flex gap-2 overflow-x-auto border-t border-[var(--color-border)] px-4 py-3 lg:hidden">
-              <MobileItem to="/" icon={LayoutDashboard} label="Dashboard" />
+              <MobileItem to="/home" icon={LayoutDashboard} label="Dashboard" />
               <MobileItem to="/clubs" icon={Users} label="Clubs" />
               <MobileItem to="/create-club" icon={Plus} label="Create" />
               <MobileItem to="/profile" icon={User} label="Profile" />

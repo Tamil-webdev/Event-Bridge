@@ -6,6 +6,7 @@ import { getColleges } from "../api/college";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import Field from "../components/ui/Field";
+import { getStates, getDistricts } from "../data/locations";
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -14,10 +15,14 @@ function Register() {
     password: "",
     role: "student",
     collegeId: "",
+    state: "",
+    district: "",
   });
   const [colleges, setColleges] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [states, setStates] = useState([]);
+  const [districts, setDistricts] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,20 +34,37 @@ function Register() {
         console.error("Failed to fetch colleges", err);
       }
     };
+    const statesList = getStates();
+    setStates(statesList);
     fetchColleges();
   }, []);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    
+    // Update districts when state changes
+    if (name === "state") {
+      const districtsList = getDistricts(value);
+      setDistricts(districtsList);
+      setFormData(prev => ({ ...prev, district: "" }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    
+    if (!formData.state || !formData.district) {
+      setError("Please select both state and district");
+      toast.error("Please select both state and district");
+      return;
+    }
+    
     setLoading(true);
 
     try {
-      await register(formData.name, formData.email, formData.password, formData.role, formData.collegeId);
+      await register(formData.name, formData.email, formData.password, formData.role, formData.collegeId, formData.state, formData.district);
       toast.success("Account created");
       navigate("/login");
     } catch (err) {
@@ -84,6 +106,24 @@ function Register() {
             {colleges.map((college) => (
               <option key={college._id} value={college._id}>
                 {college.name}
+              </option>
+            ))}
+          </Field>
+
+          <Field as="select" label="State" name="state" value={formData.state} onChange={handleChange} required>
+            <option value="">Select a state</option>
+            {states.map((state) => (
+              <option key={state} value={state}>
+                {state}
+              </option>
+            ))}
+          </Field>
+
+          <Field as="select" label="District" name="district" value={formData.district} onChange={handleChange} required disabled={!formData.state}>
+            <option value="">Select a district</option>
+            {districts.map((district) => (
+              <option key={district} value={district}>
+                {district}
               </option>
             ))}
           </Field>

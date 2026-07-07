@@ -24,7 +24,7 @@ function Login() {
     try {
       await login(email, password);
       toast.success("Welcome back");
-      navigate("/");
+      navigate("/home");
     } catch (err) {
       const message = err.response?.data?.message || "Login failed";
       setError(message);

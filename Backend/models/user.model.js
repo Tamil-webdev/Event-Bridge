@@ -76,6 +76,18 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+
+    state:{
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    district:{
+      type: String,
+      default: "",
+      trim: true,
+    },
   },
   {timestamps: true}
 );

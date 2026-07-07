@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { isAuthenticated } from "./api/auth";
 import Layout from "./componants/Layout";
 
+import LandingPage from "./Pages/LandingPage";
 import Login from "./Pages/LoginPage";
 import Register from "./Pages/RegisterPage";
 import Profile from "./Pages/ProfilePage";
@@ -18,16 +19,20 @@ function App() {
     <Router>
       <Routes>
         <Route
+          path="/"
+          element={isAuthenticated() ? <Navigate to="/home" replace /> : <LandingPage />}
+        />
+        <Route
           path="/login"
-          element={isAuthenticated() ? <Navigate to="/" replace /> : <Login />}
+          element={isAuthenticated() ? <Navigate to="/home" replace /> : <Login />}
         />
         <Route
           path="/register"
-          element={isAuthenticated() ? <Navigate to="/" replace /> : <Register />}
+          element={isAuthenticated() ? <Navigate to="/home" replace /> : <Register />}
         />
 
         <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/create-club" element={<CreateClub />} />
           <Route path="/clubs" element={<Clubs />} />

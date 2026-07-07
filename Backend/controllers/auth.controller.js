@@ -4,20 +4,22 @@ const User = require("../models/user.model");
 
 const register = async (req, res) => {
     try{
-        const { name, email, password, role, collegeId } = req.body;
+        const { name, email, password, role, collegeId, state, district } = req.body;
         const exists = await User.findOne({ email });
         if (exists) {
             return res.status(400).json({ message: "User Already Exists" });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        console.log("creating user with:", { name, email, role, collegeId }); 
+        console.log("creating user with:", { name, email, role, collegeId, state, district }); 
         const user = await User.create({
             name,
             email,
             password: hashedPassword,
             role,
-            collegeId: collegeId||null
+            collegeId: collegeId||null,
+            state: state||"",
+            district: district||""
         });
         console.log("User created in DB:", user);
 
