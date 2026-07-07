@@ -1,7 +1,8 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useRevalidator } from "react-router-dom";
+import { useState } from "react";
 import { getLoggedInUser } from "../api/auth";
-import { deleteEvent } from "../api/event";
-import { CalendarDays, Clock, Edit3, GraduationCap, MapPin, Trash2 } from "lucide-react";
+import { deleteEvent, registerForEvent, unregisterFromEvent } from "../api/event";
+import { CalendarDays, Clock, Edit3, GraduationCap, MapPin, Trash2, CheckCircle2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { createElement } from "react";
 import Card from "../components/ui/Card";
@@ -10,10 +11,12 @@ import Button from "../components/ui/Button";
 const DEFAULT_IMAGE =
   "https://img.freepik.com/free-vector/hand-drawn-flat-design-innovation-concept_52683-78089.jpg?semt=ais_hybrid&w=740&q=80";
 
-const EventCard = ({ event }) => {
+const EventCard = ({ event, onStatusChange }) => {
   const navigate = useNavigate();
   const user = getLoggedInUser();
   const isCreator = user?._id === event?.createdBy?._id || user?._id === event?.createdBy;
+  const isRegistered = event?.registeredUsers?.includes(user?._id);
+  const [loading, setLoading] = useState(false);
 
   const imageUrl = event?.image
     ? event.image.startsWith("http")
@@ -47,6 +50,28 @@ const EventCard = ({ event }) => {
     } catch (err) {
       toast.error("Failed to delete event");
       console.error(err);
+    }
+  };
+
+  const handleRegister = async (e) => {
+    e.stopPropagation();
+    setLoading(true);
+    try {
+      if (isRegistered) {
+        await unregisterFromEvent(event._id);
+        toast.success("Unregistered from event");
+      } else {
+        await registerForEvent(event._id);
+        toast.success("Registered for event");
+      }
+      if (onStatusChange) {
+        onStatusChange();
+      }
+    } catch (err) {
+      toast.error(isRegistered ? "Failed to unregister" : "Failed to register");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -103,6 +128,7 @@ const EventCard = ({ event }) => {
         <div className="mt-5 grid gap-3 text-sm text-[var(--color-text-2)]">
           <Meta icon={CalendarDays}>{formattedDate}</Meta>
           {event?.eventTime && <Meta icon={Clock}>{event.eventTime}</Meta>}
+          {event?.district && <Meta icon={MapPin}>{event.district}</Meta>}
           {event?.venue && <Meta icon={MapPin}>{event.venue}</Meta>}
           {event?.collegeId && (
             <Meta icon={GraduationCap}>
@@ -119,6 +145,24 @@ const EventCard = ({ event }) => {
               Upcoming
             </span>
           </div>
+          {!isCreator && user && (
+            <Button
+              onClick={handleRegister}
+              loading={loading}
+              variant={isRegistered ? "secondary" : "primary"}
+              size="sm"
+              className="mt-3 w-full"
+            >
+              {isRegistered ? (
+                <>
+                  <CheckCircle2 className="h-4 w-4" />
+                  Registered
+                </>
+              ) : (
+                "Register"
+              )}
+            </Button>
+          )}
         </div>
       </div>
     </Card>

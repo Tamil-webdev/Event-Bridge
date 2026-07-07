@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, Plus, Search, Sparkles, TrendingUp, Users } from "lucide-react";
+import { CalendarDays, Plus, Search, Sparkles, TrendingUp, Users, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import EventCard from "../componants/EventCard";
 import { getEvents } from "../api/event";
+import { getLoggedInUser } from "../api/auth";
 import PageHeader from "../components/ui/PageHeader";
 import Button from "../components/ui/Button";
 import StatCard from "../components/ui/StatCard";
@@ -11,10 +12,13 @@ import { CardGridSkeleton } from "../components/ui/Skeleton";
 
 function Home() {
   const [events, setEvents] = useState([]);
+  const [registeredEvents, setRegisteredEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState("nearest");
   const navigate = useNavigate();
+  const user = getLoggedInUser();
 
   useEffect(() => {
     fetchEvents();
@@ -36,6 +40,12 @@ function Home() {
         .sort((a, b) => new Date(a.eventDate) - new Date(b.eventDate));
 
       setEvents(futureEvents);
+      
+      // Filter registered events
+      const registered = futureEvents.filter(event => 
+        event.registeredUsers?.includes(user?._id)
+      );
+      setRegisteredEvents(registered);
     } catch (err) {
       console.error(err);
       setError("Failed to load events");
@@ -44,10 +54,17 @@ function Home() {
     }
   };
 
+  const nearestEvents = useMemo(() => {
+    if (!user?.district) return [];
+    return events.filter(event => event.district === user.district);
+  }, [events, user?.district]);
+
   const filteredEvents = useMemo(() => {
-    if (!searchTerm.trim()) return events;
-    return events.filter((event) => event.title?.toLowerCase().includes(searchTerm.toLowerCase()));
-  }, [events, searchTerm]);
+    const sourceEvents = activeTab === "registered" ? registeredEvents : nearestEvents;
+    
+    if (!searchTerm.trim()) return sourceEvents;
+    return sourceEvents.filter((event) => event.title?.toLowerCase().includes(searchTerm.toLowerCase()));
+  }, [nearestEvents, registeredEvents, searchTerm, activeTab]);
 
   const uniqueClubs = new Set(events.map((event) => event.clubId?._id || event.clubId?.name).filter(Boolean)).size;
   const thisWeek = events.filter((event) => {
@@ -57,6 +74,19 @@ function Home() {
     weekOut.setDate(now.getDate() + 7);
     return date >= now && date <= weekOut;
   }).length;
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-7xl">
+        <PageHeader
+          eyebrow="Dashboard"
+          title="Discover campus events"
+          description="Browse upcoming workshops, meetups, and club-led activities in one polished workspace."
+        />
+        <CardGridSkeleton count={6} />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -78,6 +108,30 @@ function Home() {
         <StatCard label="This week" value={thisWeek} icon={TrendingUp} tone="accent" progress={48} />
       </section>
 
+      <section className="mb-6 flex gap-2 border-b border-[var(--color-border)]">
+        <button
+          onClick={() => setActiveTab("nearest")}
+          className={`px-4 py-3 font-semibold transition ${
+            activeTab === "nearest"
+              ? "border-b-2 border-[var(--color-primary)] text-[var(--color-primary)]"
+              : "text-[var(--color-text-2)] hover:text-[var(--color-text-1)]"
+          }`}
+        >
+          Nearest Events ({nearestEvents.length})
+        </button>
+        <button
+          onClick={() => setActiveTab("registered")}
+          className={`flex items-center gap-2 px-4 py-3 font-semibold transition ${
+            activeTab === "registered"
+              ? "border-b-2 border-[var(--color-primary)] text-[var(--color-primary)]"
+              : "text-[var(--color-text-2)] hover:text-[var(--color-text-1)]"
+          }`}
+        >
+          <Heart className="h-4 w-4" />
+          My Events ({registeredEvents.length})
+        </button>
+      </section>
+
       <section className="mb-8 rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-3">
@@ -86,7 +140,13 @@ function Home() {
             </div>
             <div>
               <h2 className="font-display text-xl font-bold text-[var(--color-text-1)]">Event pipeline</h2>
-              <p className="text-sm text-[var(--color-text-2)]">Sorted by nearest date and filtered to future events.</p>
+              <p className="text-sm text-[var(--color-text-2)]">
+                {activeTab === "registered" 
+                  ? "Events you've registered for" 
+                  : user?.district 
+                  ? `Events in ${user.district}` 
+                  : "All upcoming events"}
+              </p>
             </div>
           </div>
           <div className="relative w-full md:w-96">
@@ -124,7 +184,7 @@ function Home() {
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {filteredEvents.map((event) => (
-            <EventCard key={event._id} event={event} />
+            <EventCard key={event._id} event={event} onStatusChange={fetchEvents} />
           ))}
         </div>
       )}

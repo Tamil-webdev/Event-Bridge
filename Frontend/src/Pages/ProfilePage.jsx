@@ -23,8 +23,10 @@ function Profile() {
   const storedMedia = useMemo(() => getStoredMedia(), []);
   const [avatar, setAvatar] = useState(storedMedia.avatar || "");
   const [cover, setCover] = useState(storedMedia.cover || "");
+  const [banner, setBanner] = useState(storedMedia.banner || "");
   const [pendingAvatar, setPendingAvatar] = useState("");
   const [pendingCover, setPendingCover] = useState("");
+  const [pendingBanner, setPendingBanner] = useState("");
   const [avatarPosition, setAvatarPosition] = useState(storedMedia.avatarPosition || 50);
 
   if (!user) {
@@ -87,6 +89,22 @@ function Profile() {
     toast.success("Cover removed");
   };
 
+  const confirmBanner = () => {
+    const next = { ...getStoredMedia(), banner: pendingBanner };
+    setBanner(pendingBanner);
+    setPendingBanner("");
+    persistMedia(next);
+    toast.success("Banner image updated");
+  };
+
+  const removeBanner = () => {
+    const next = { ...getStoredMedia(), banner: "" };
+    setBanner("");
+    setPendingBanner("");
+    persistMedia(next);
+    toast.success("Banner removed");
+  };
+
   return (
     <div className="mx-auto max-w-7xl">
       <Card className="overflow-hidden">
@@ -103,19 +121,19 @@ function Profile() {
         </div>
 
         <div className="px-5 pb-8 sm:px-8">
-          <div className="-mt-16 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-            <div className="flex flex-col gap-5 sm:flex-row sm:items-end">
-              <div className="group grid h-32 w-32 place-items-center overflow-hidden rounded-full border-4 border-[var(--color-surface)] bg-[var(--color-card)] text-4xl font-bold text-[var(--color-primary)] shadow-xl transition duration-300 hover:scale-105">
+          <div className="-mt-16 flex flex-col gap-5 sm:gap-8 md:flex-row md:items-end md:justify-between md:overflow-visible">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:overflow-visible">
+              <div className="h-32 w-32 shrink-0 overflow-hidden rounded-full border-4 border-[var(--color-surface)] bg-[var(--color-card)] text-4xl font-bold text-[var(--color-primary)] shadow-xl">
                 {avatar ? (
                   <img
                     src={avatar}
                     alt={`${user.name} avatar`}
                     loading="lazy"
-                    className="h-full w-full object-cover transition duration-300"
+                    className="h-full w-full object-cover"
                     style={{ objectPosition: `center ${avatarPosition}%` }}
                   />
                 ) : (
-                  initials
+                  <div className="grid h-full w-full place-items-center">{initials}</div>
                 )}
               </div>
 
@@ -210,6 +228,20 @@ function Profile() {
                   <Button onClick={confirmCover}>
                     <Save className="h-4 w-4" aria-hidden="true" />
                     Confirm Cover
+                  </Button>
+                )}
+
+                <ImageUploader
+                  label="Profile Banner"
+                  value={pendingBanner || banner}
+                  onChange={({ preview }) => setPendingBanner(preview)}
+                  onRemove={removeBanner}
+                />
+
+                {pendingBanner && (
+                  <Button onClick={confirmBanner}>
+                    <Save className="h-4 w-4" aria-hidden="true" />
+                    Confirm Banner
                   </Button>
                 )}
               </div>

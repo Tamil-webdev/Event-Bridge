@@ -41,6 +41,11 @@ const clubSchema = new mongoose.Schema({
     isActive:{
         type:Boolean,
         default:true
+    },
+
+    banner:{
+        type:String,
+        default:""
     }
 
 },{timeStamps:true});

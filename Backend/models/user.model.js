@@ -88,6 +88,18 @@ const userSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+
+    banner:{
+      type: String,
+      default: "",
+    },
+
+    registeredEvents:[
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Event",
+      },
+    ],
   },
   {timestamps: true}
 );

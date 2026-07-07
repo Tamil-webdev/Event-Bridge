@@ -6,14 +6,14 @@ const createEvent = async (req, res) => {
   try{
     const userId = req.user.id || req.user._id;
 
-    const { title, description, eventDate, eventTime, clubId } = req.body;
+    const { title, description, eventDate, eventTime, clubId, district } = req.body;
 
     let image = req.body.image || "";
     if(req.file) {
       image = `/uploads/${req.file.filename}`;
     }
 
-    if(!title || !description || !eventDate || !clubId) {
+    if(!title || !description || !eventDate || !clubId || !district) {
       return res.status(400).json({
         message: "All required fields must be provided",
       });
@@ -40,6 +40,7 @@ const createEvent = async (req, res) => {
       eventDate,
       eventTime,
       image,
+      district,
       clubId: club._id,
       collegeId: club.collegeId,
       createdBy: userId,
@@ -156,6 +157,49 @@ const deleteEvent = async(req, res)=>{
   }
 };
 
+const registerForEvent = async(req, res)=>{
+  try {
+    const userId = req.user.id || req.user._id;
+    const eventId = req.params.id;
+
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    const isRegistered = event.registeredUsers?.includes(userId);
+    if (isRegistered) {
+      return res.status(400).json({ message: "Already registered for this event" });
+    }
+
+    await Event.findByIdAndUpdate(eventId, { $push: { registeredUsers: userId } });
+    await User.findByIdAndUpdate(userId, { $push: { registeredEvents: eventId } });
+
+    res.json({ message: "Registered for event successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const unregisterFromEvent = async(req, res)=>{
+  try {
+    const userId = req.user.id || req.user._id;
+    const eventId = req.params.id;
+
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    await Event.findByIdAndUpdate(eventId, { $pull: { registeredUsers: userId } });
+    await User.findByIdAndUpdate(userId, { $pull: { registeredEvents: eventId } });
+
+    res.json({ message: "Unregistered from event successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 module.exports = {
   createEvent,
   getAllEvents,
@@ -163,4 +207,6 @@ module.exports = {
   getEventById,
   updateEvent,
   deleteEvent,
+  registerForEvent,
+  unregisterFromEvent,
 };

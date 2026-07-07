@@ -12,6 +12,8 @@ const {
   getEventById,
   updateEvent,
   deleteEvent,
+  registerForEvent,
+  unregisterFromEvent,
 } = require("../controllers/event.controller");
 
 const uploadDir = path.join(__dirname, "../uploads");
@@ -35,6 +37,8 @@ router.get("/club/:id", getEventsByClub);
 router.get("/:id", getEventById);
 
 router.post("/", auth, upload.single("image"), createEvent);
+router.post("/:id/register", auth, registerForEvent);
+router.post("/:id/unregister", auth, unregisterFromEvent);
 router.put("/:id", auth, updateEvent);
 router.delete("/:id", auth, deleteEvent);
 

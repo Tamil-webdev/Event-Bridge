@@ -47,6 +47,19 @@ const eventSchema = new mongoose.Schema(
       type: Boolean,
       default:true,
     },
+
+    district:{
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    registeredUsers:[
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   {
     timestamps:true,

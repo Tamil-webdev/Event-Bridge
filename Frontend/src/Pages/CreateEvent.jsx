@@ -8,18 +8,22 @@ import Card from "../components/ui/Card";
 import Field from "../components/ui/Field";
 import ImageUploader from "../components/ui/ImageUploader";
 import PageHeader from "../components/ui/PageHeader";
+import { getStates, getDistricts } from "../data/locations";
+import { getLoggedInUser } from "../api/auth";
 
 function CreateEvent() {
   const { clubId } = useParams();
   const navigate = useNavigate();
+  const user = getLoggedInUser();
 
-  const [form, setForm] = useState({ title: "", description: "", eventDate: "", eventTime: "", venue: "" });
+  const [form, setForm] = useState({ title: "", description: "", eventDate: "", eventTime: "", venue: "", district: user?.district || "" });
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [dateError, setDateError] = useState("");
   const [timeError, setTimeError] = useState("");
+  const [districts] = useState(getDistricts(user?.state || ""));
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -30,6 +34,11 @@ function CreateEvent() {
     setError("");
     setDateError("");
     setTimeError("");
+
+    if (!form.district) {
+      setError("Please select a district");
+      return;
+    }
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -95,6 +104,14 @@ function CreateEvent() {
               <Field label="Time" name="eventTime" type="time" value={form.eventTime} onChange={handleChange} required error={timeError} />
             </div>
             <Field label="Venue" name="venue" value={form.venue} onChange={handleChange} />
+            <Field as="select" label="District" name="district" value={form.district} onChange={handleChange} required>
+              <option value="">Select a district</option>
+              {districts.map((district) => (
+                <option key={district} value={district}>
+                  {district}
+                </option>
+              ))}
+            </Field>
           </div>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
