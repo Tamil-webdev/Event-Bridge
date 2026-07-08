@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { ArrowLeft, CalendarPlus } from "lucide-react";
@@ -23,7 +23,16 @@ function CreateEvent() {
   const [error, setError] = useState("");
   const [dateError, setDateError] = useState("");
   const [timeError, setTimeError] = useState("");
-  const [districts] = useState(getDistricts(user?.state || ""));
+  const [districts, setDistricts] = useState([]);
+
+  useEffect(() => {
+    if (!user?.state) {
+      setDistricts([]);
+      return;
+    }
+
+    setDistricts(getDistricts(user.state));
+  }, [user?.state]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });

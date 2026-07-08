@@ -21,7 +21,7 @@ function Register() {
   const [colleges, setColleges] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [states, setStates] = useState([]);
+  const [states] = useState(() => getStates());
   const [districts, setDistricts] = useState([]);
   const navigate = useNavigate();
 
@@ -34,8 +34,6 @@ function Register() {
         console.error("Failed to fetch colleges", err);
       }
     };
-    const statesList = getStates();
-    setStates(statesList);
     fetchColleges();
   }, []);
 
