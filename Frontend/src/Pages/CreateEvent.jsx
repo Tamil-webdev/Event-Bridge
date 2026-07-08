@@ -16,26 +16,34 @@ function CreateEvent() {
   const navigate = useNavigate();
   const user = getLoggedInUser();
 
-  const [form, setForm] = useState({ title: "", description: "", eventDate: "", eventTime: "", venue: "", district: user?.district || "" });
+  const [form, setForm] = useState({ title: "", description: "", eventDate: "", eventTime: "", venue: "", state: user?.state || "", district: user?.district || "" });
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [dateError, setDateError] = useState("");
   const [timeError, setTimeError] = useState("");
+  const [states] = useState(() => getStates());
   const [districts, setDistricts] = useState([]);
 
   useEffect(() => {
-    if (!user?.state) {
+    const userState = form.state || user?.state || "";
+    if (!userState) {
       setDistricts([]);
       return;
     }
-
-    setDistricts(getDistricts(user.state));
-  }, [user?.state]);
+    setDistricts(getDistricts(userState));
+  }, [form.state, user?.state]);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => {
+      const nextForm = { ...prev, [name]: value };
+      if (name === "state") {
+        nextForm.district = "";
+      }
+      return nextForm;
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -44,8 +52,8 @@ function CreateEvent() {
     setDateError("");
     setTimeError("");
 
-    if (!form.district) {
-      setError("Please select a district");
+    if (!form.state || !form.district) {
+      setError("Please select both state and district");
       return;
     }
 
@@ -113,7 +121,15 @@ function CreateEvent() {
               <Field label="Time" name="eventTime" type="time" value={form.eventTime} onChange={handleChange} required error={timeError} />
             </div>
             <Field label="Venue" name="venue" value={form.venue} onChange={handleChange} />
-            <Field as="select" label="District" name="district" value={form.district} onChange={handleChange} required>
+            <Field as="select" label="State" name="state" value={form.state} onChange={handleChange} required>
+              <option value="">Select a state</option>
+              {states.map((state) => (
+                <option key={state} value={state}>
+                  {state}
+                </option>
+              ))}
+            </Field>
+            <Field as="select" label="District" name="district" value={form.district} onChange={handleChange} required disabled={!form.state}>
               <option value="">Select a district</option>
               {districts.map((district) => (
                 <option key={district} value={district}>
