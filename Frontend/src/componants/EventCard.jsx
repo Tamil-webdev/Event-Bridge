@@ -31,6 +31,10 @@ const EventCard = ({ event, onStatusChange }) => {
       .join(", ");
   };
 
+  const collegeLabel = event?.collegeId?.address
+    ? formatAddress(event.collegeId.address)
+    : event?.collegeId?.name || "Unknown College";
+
   const formattedDate = event?.eventDate
     ? new Date(event.eventDate).toLocaleDateString(undefined, {
         year: "numeric",
@@ -131,10 +135,7 @@ const EventCard = ({ event, onStatusChange }) => {
           {event?.district && <Meta icon={MapPin}>{event.district}</Meta>}
           {event?.venue && <Meta icon={MapPin}>{event.venue}</Meta>}
           {event?.collegeId && (
-            <Meta icon={GraduationCap}>
-              {event.collegeId.name}
-              {event.collegeId.address ? `, ${formatAddress(event.collegeId.address)}` : ""}
-            </Meta>
+            <Meta icon={GraduationCap}>{collegeLabel}</Meta>
           )}
         </div>
 

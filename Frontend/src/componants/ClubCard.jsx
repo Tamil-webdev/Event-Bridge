@@ -9,6 +9,17 @@ function ClubCard({ club }) {
   const navigate = useNavigate();
   const imageUrl = club.image ? `${import.meta.env.VITE_BACKEND_URL}${club.image}` : DEFAULT_CLUB_IMAGE;
 
+  const formatAddress = (address) => {
+    if (!address) return "";
+    return [address.num, address.street, address.area, address.city, address.state, address.pincode]
+      .filter(Boolean)
+      .join(", ");
+  };
+
+  const collegeLabel = club.collegeId?.address
+    ? formatAddress(club.collegeId.address)
+    : club.collegeId?.name || "Unknown College";
+
   return (
     <Card
       as="button"
@@ -38,7 +49,7 @@ function ClubCard({ club }) {
         </div>
         <h3 className="font-display text-xl font-bold text-[var(--color-text-1)]">{club.name}</h3>
         <p className="mt-1 text-sm font-medium text-[var(--color-primary)]">
-          {club.collegeId?.name || "Unknown College"}
+          {collegeLabel}
         </p>
         <p className="mt-3 line-clamp-3 text-sm leading-6 text-[var(--color-text-2)]">
           {club.description || "Explore events and announcements from this campus club."}

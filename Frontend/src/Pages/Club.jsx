@@ -20,6 +20,17 @@ function Club() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const formatAddress = (address) => {
+    if (!address) return "";
+    return [address.num, address.street, address.area, address.city, address.state, address.pincode]
+      .filter(Boolean)
+      .join(", ");
+  };
+
+  const collegeLabel = club?.collegeId?.address
+    ? formatAddress(club.collegeId.address)
+    : club?.collegeId?.name || "Unknown College";
+
   const fetchAllData = useCallback(async () => {
     setLoading(true);
     setError("");
@@ -107,7 +118,7 @@ function Club() {
                 <h1 className="font-display text-3xl font-bold text-[var(--color-text-1)] md:text-[36px]">{club.name}</h1>
                 <p className="mt-2 flex items-center gap-2 text-sm font-medium text-[var(--color-text-2)]">
                   <MapPin className="h-4 w-4 text-[var(--color-primary)]" />
-                  {club.collegeId?.name || "Unknown College"}
+                  {collegeLabel}
                 </p>
               </div>
             </div>
