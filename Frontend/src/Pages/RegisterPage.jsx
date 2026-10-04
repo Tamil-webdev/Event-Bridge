@@ -39,14 +39,18 @@ function Register() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    
-    // Update districts when state changes
-    if (name === "state") {
-      const districtsList = getDistricts(value);
-      setDistricts(districtsList);
-      setFormData(prev => ({ ...prev, district: "" }));
-    }
+
+    setFormData((prev) => {
+      const nextData = { ...prev, [name]: value };
+
+      if (name === "state") {
+        const districtsList = getDistricts(value);
+        setDistricts(districtsList);
+        nextData.district = "";
+      }
+
+      return nextData;
+    });
   };
 
   const handleSubmit = async (e) => {

@@ -61,9 +61,25 @@ function Home() {
 
   const filteredEvents = useMemo(() => {
     const sourceEvents = activeTab === "registered" ? registeredEvents : nearestEvents;
-    
+
     if (!searchTerm.trim()) return sourceEvents;
-    return sourceEvents.filter((event) => event.title?.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    const normalizedSearch = searchTerm.toLowerCase().trim();
+    return sourceEvents.filter((event) => {
+      const searchableText = [
+        event.title,
+        event.description,
+        event.venue,
+        event.district,
+        event.clubId?.name,
+        event.clubId?.category,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return searchableText.includes(normalizedSearch);
+    });
   }, [nearestEvents, registeredEvents, searchTerm, activeTab]);
 
   const uniqueClubs = new Set(events.map((event) => event.clubId?._id || event.clubId?.name).filter(Boolean)).size;
